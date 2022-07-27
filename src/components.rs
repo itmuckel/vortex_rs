@@ -15,8 +15,12 @@ pub struct Position {
 pub struct Renderable {
     pub glyph: FontCharType,
     pub fg: RGB,
-    pub bg: RGB,
+    pub bg: RGBA,
 }
 
 #[derive(Component)]
-pub struct LeftMover {}
+pub struct FieldOfView {
+    pub visible_tiles: Vec<Point>,
+    pub range: i32,
+    pub dirty: bool,
+}
