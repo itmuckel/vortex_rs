@@ -5,6 +5,14 @@ use specs_derive::Component;
 #[derive(Component, Debug)]
 pub struct Player {}
 
+#[derive(Component, Debug)]
+pub struct Monster {}
+
+#[derive(Component, Debug)]
+pub struct Name {
+    pub name: String,
+}
+
 #[derive(Component)]
 pub struct Position {
     pub x: i32,

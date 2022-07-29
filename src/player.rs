@@ -3,12 +3,13 @@ use num::clamp;
 use specs::prelude::*;
 
 use crate::components::Player;
-use crate::{FieldOfView, Map, Position, State, TileType};
+use crate::{FieldOfView, Map, Position, RunState, State, TileType};
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
     let mut positions = ecs.write_storage::<Position>();
     let mut players = ecs.write_storage::<Player>();
     let mut fovs = ecs.write_storage::<FieldOfView>();
+    let mut player_pos = ecs.write_resource::<Point>();
     let map = ecs.fetch::<Map>();
 
     for (_player, pos, fov) in (&mut players, &mut positions, &mut fovs).join() {
@@ -20,19 +21,25 @@ pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
             pos.x = dest_x;
             pos.y = dest_y;
             fov.dirty = true;
+
+            player_pos.x = pos.x;
+            player_pos.y = pos.y;
         }
     }
 }
 
-pub fn player_input(gs: &mut State, ctx: &mut BTerm) {
+pub fn player_input(gs: &mut State, ctx: &mut BTerm) -> RunState {
     match ctx.key {
-        None => {}
+        None => { return RunState::Paused; }
         Some(key) => match key {
             VirtualKeyCode::Left | VirtualKeyCode::Numpad4 => try_move_player(-1, 0, &mut gs.ecs),
             VirtualKeyCode::Right | VirtualKeyCode::Numpad6 => try_move_player(1, 0, &mut gs.ecs),
             VirtualKeyCode::Up | VirtualKeyCode::Numpad8 => try_move_player(0, -1, &mut gs.ecs),
             VirtualKeyCode::Down | VirtualKeyCode::Numpad2 => try_move_player(0, 1, &mut gs.ecs),
-            _ => {}
+            _ => {
+                return RunState::Paused;
+            }
         },
     }
+    RunState::Running
 }
