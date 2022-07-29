@@ -60,7 +60,9 @@ impl SufferDamage {
         if let Some(suffering) = store.get_mut(victim) {
             suffering.amounts.push(amount);
         } else {
-            let dmg = SufferDamage { amounts: vec![amount] };
+            let dmg = SufferDamage {
+                amounts: vec![amount],
+            };
             store.insert(victim, dmg).expect("Unable to insert damage");
         }
     }

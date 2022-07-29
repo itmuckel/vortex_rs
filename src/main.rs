@@ -2,7 +2,10 @@ use bracket_lib::prelude::*;
 use specs::prelude::*;
 
 use crate::colors::{FLOOR_COLOR, TRANSPARENT_COLOR};
-use crate::components::{BlocksTile, CombatStats, FieldOfView, Monster, Name, Player, Position, Renderable, SufferDamage, WantsToMelee};
+use crate::components::{
+    BlocksTile, CombatStats, FieldOfView, Monster, Name, Player, Position, Renderable,
+    SufferDamage, WantsToMelee,
+};
 use crate::damage_system::DamageSystem;
 use crate::map::{Map, TileType};
 use crate::map_indexing_system::MapIndexingSystem;
@@ -11,16 +14,18 @@ use crate::monster_ai_system::MonsterAI;
 use crate::player::player_input;
 use crate::visibility_system::VisibilitySystem;
 
+mod colors;
 mod components;
+mod damage_system;
+mod gamelog;
+mod gui;
 mod map;
+mod map_indexing_system;
+mod melee_combat_system;
 mod monster_ai_system;
 mod player;
 mod rect;
 mod visibility_system;
-mod map_indexing_system;
-mod colors;
-mod melee_combat_system;
-mod damage_system;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum RunState {
@@ -96,6 +101,8 @@ impl GameState for State {
                 ctx.set(pos.x, pos.y, render.fg, FLOOR_COLOR, render.glyph);
             }
         }
+
+        gui::draw_ui(&self.ecs, ctx);
     }
 }
 
@@ -138,9 +145,7 @@ fn draw_map(ecs: &World, ctx: &mut BTerm) {
 
 fn main() -> BError {
     let context = BTermBuilder::simple80x50().with_title("vortex").build()?;
-    let mut gs = State {
-        ecs: World::new(),
-    };
+    let mut gs = State { ecs: World::new() };
 
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
@@ -177,7 +182,9 @@ fn main() -> BError {
         gs.ecs
             .create_entity()
             .with(Monster {})
-            .with(Name { name: format!("{} #{}", name, i) })
+            .with(Name {
+                name: format!("{} #{}", name, i),
+            })
             .with(CombatStats {
                 max_hp: 16,
                 hp: 16,
@@ -200,7 +207,8 @@ fn main() -> BError {
     }
 
     // Player
-    let player_entity = gs.ecs
+    let player_entity = gs
+        .ecs
         .create_entity()
         .with(Player {})
         .with(Name {
@@ -232,6 +240,9 @@ fn main() -> BError {
     gs.ecs.insert(map);
     gs.ecs.insert(Point::new(player_x, player_y));
     gs.ecs.insert(RunState::PreRun);
+    gs.ecs.insert(gamelog::GameLog {
+        entries: vec!["Welcome to vortex!".to_string()],
+    });
 
     main_loop(context, gs)
 }

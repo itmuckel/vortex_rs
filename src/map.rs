@@ -5,8 +5,8 @@ use specs::Entity;
 
 use crate::rect::Rect;
 
-const WIDTH: i32 = 80;
-const HEIGHT: i32 = 50;
+pub const WIDTH: i32 = 80;
+pub const HEIGHT: i32 = 43;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum TileType {
@@ -37,16 +37,32 @@ impl BaseMap for Map {
         let w = self.width as usize;
 
         // Cardinal directions
-        if self.is_exit_valid(x - 1, y) { exits.push((idx - 1, 1.0)); }
-        if self.is_exit_valid(x + 1, y) { exits.push((idx + 1, 1.0)); }
-        if self.is_exit_valid(x, y - 1) { exits.push((idx - w, 1.0)); }
-        if self.is_exit_valid(x, y + 1) { exits.push((idx + w, 1.0)); }
+        if self.is_exit_valid(x - 1, y) {
+            exits.push((idx - 1, 1.0));
+        }
+        if self.is_exit_valid(x + 1, y) {
+            exits.push((idx + 1, 1.0));
+        }
+        if self.is_exit_valid(x, y - 1) {
+            exits.push((idx - w, 1.0));
+        }
+        if self.is_exit_valid(x, y + 1) {
+            exits.push((idx + w, 1.0));
+        }
 
         // Diagonals
-        if self.is_exit_valid(x - 1, y - 1) { exits.push(((idx - w) - 1, 1.45)); }
-        if self.is_exit_valid(x + 1, y - 1) { exits.push(((idx - w) + 1, 1.45)); }
-        if self.is_exit_valid(x - 1, y + 1) { exits.push(((idx + w) - 1, 1.45)); }
-        if self.is_exit_valid(x + 1, y + 1) { exits.push(((idx + w) + 1, 1.45)); }
+        if self.is_exit_valid(x - 1, y - 1) {
+            exits.push(((idx - w) - 1, 1.45));
+        }
+        if self.is_exit_valid(x + 1, y - 1) {
+            exits.push(((idx - w) + 1, 1.45));
+        }
+        if self.is_exit_valid(x - 1, y + 1) {
+            exits.push(((idx + w) - 1, 1.45));
+        }
+        if self.is_exit_valid(x + 1, y + 1) {
+            exits.push(((idx + w) + 1, 1.45));
+        }
 
         exits
     }
